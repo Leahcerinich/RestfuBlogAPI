@@ -18,6 +18,7 @@ mongoose.connect(process.env.MONGODB_URI);
 //mongoose blog model 
 const blogSchema = new mongoose.Schema({
     title: String,
+    author: String,
     image: String,
     body: String,
     created: { type: Date, default: Date.now }
@@ -39,6 +40,7 @@ app.options("/*", function(req, res, next){
 
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     console.log('middleware called')
     next();
@@ -48,6 +50,7 @@ app.use(function(req, res, next) {
 app.post("/blogs", function (req, res) {
     Blog.create({
         title: req.body.title,
+        author:req.body.author,
         image: req.body.image,
         body: req.body.body,
         created: Date.now()
@@ -110,7 +113,10 @@ app.put("/blogs/:id", function (req, res) {
 // Delete route
 app.delete("/blogs/:id", function (req, res) {
     Blog.findByIdAndDelete(req.params.id, function (err) {
-        if (err) return res.status(500).send(" There is an error with deleting the blog"); 
+        if (err) {
+            console.log(`there was an error deleting the blog =${err}`)
+        return res.status(500).send(" There is an error with deleting the blog");
+        } 
             res.status(200).send("blog was deleted");
     });
 });
